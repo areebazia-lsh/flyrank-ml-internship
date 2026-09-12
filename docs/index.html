@@ -1,1 +1,1158 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Content Refresh Opportunity Scoring | FlyRank ML Capstone</title>
+
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --border: #e4e7ec;
+      --primary: #3157d5;
+      --primary-light: #eef2ff;
+      --success: #087443;
+      --success-light: #ecfdf3;
+      --warning: #b54708;
+      --warning-light: #fffaeb;
+      --max-width: 1050px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .hero {
+      background: #111827;
+      color: white;
+      padding: 80px 24px 70px;
+    }
+
+    .hero-inner {
+      max-width: var(--max-width);
+      margin: auto;
+    }
+
+    .eyebrow {
+      color: #aab9ff;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.08;
+      max-width: 850px;
+      margin: 0 0 22px;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p {
+      max-width: 780px;
+      color: #d1d5db;
+      font-size: 18px;
+      margin: 0;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255,255,255,0.96);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+    }
+
+    .nav-inner {
+      max-width: var(--max-width);
+      margin: auto;
+      padding: 12px 20px;
+      display: flex;
+      gap: 18px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    nav a {
+      color: #475467;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    nav a:hover {
+      color: var(--primary);
+    }
+
+    main {
+      max-width: var(--max-width);
+      margin: auto;
+      padding: 50px 20px 80px;
+    }
+
+    section {
+      margin-bottom: 60px;
+      scroll-margin-top: 75px;
+    }
+
+    .section-number {
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    h2 {
+      font-size: 30px;
+      line-height: 1.25;
+      margin: 0 0 20px;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      font-size: 21px;
+      margin-top: 34px;
+      margin-bottom: 12px;
+    }
+
+    p {
+      margin: 0 0 16px;
+    }
+
+    ul, ol {
+      padding-left: 24px;
+    }
+
+    li {
+      margin-bottom: 9px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 28px 0;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 2px 8px rgba(16, 24, 40, 0.03);
+    }
+
+    .card strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 7px;
+    }
+
+    .card span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .callout {
+      background: var(--primary-light);
+      border-left: 4px solid var(--primary);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin: 24px 0;
+    }
+
+    .callout.warning {
+      background: var(--warning-light);
+      border-left-color: var(--warning);
+    }
+
+    .callout.success {
+      background: var(--success-light);
+      border-left-color: var(--success);
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 28px 0;
+    }
+
+    .metric {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+    }
+
+    .metric .value {
+      font-size: 27px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.2;
+    }
+
+    .metric .label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 7px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 24px 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 620px;
+    }
+
+    th, td {
+      padding: 13px 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    th {
+      background: #f9fafb;
+      font-weight: 700;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .highlight {
+      font-weight: 800;
+      color: var(--success);
+    }
+
+    .bar-chart {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      margin: 25px 0;
+    }
+
+    .bar-row {
+      margin-bottom: 18px;
+    }
+
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .bar-bg {
+      height: 12px;
+      background: #eaecf0;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .bar {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 20px;
+    }
+
+    .rank-list {
+      counter-reset: priority;
+      list-style: none;
+      padding: 0;
+    }
+
+    .rank-list li {
+      counter-increment: priority;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px 18px 62px;
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .rank-list li::before {
+      content: counter(priority);
+      position: absolute;
+      left: 20px;
+      top: 18px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    code {
+      background: #f2f4f7;
+      border-radius: 5px;
+      padding: 2px 6px;
+      font-size: 0.9em;
+    }
+
+    pre {
+      background: #111827;
+      color: #e5e7eb;
+      padding: 20px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 13px;
+    }
+
+    .footer {
+      background: #111827;
+      color: #d1d5db;
+      padding: 40px 20px;
+    }
+
+    .footer-inner {
+      max-width: var(--max-width);
+      margin: auto;
+    }
+
+    .footer strong {
+      color: white;
+    }
+
+    @media (max-width: 800px) {
+      .card-grid,
+      .metric-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .card-grid,
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 60px 20px;
+      }
+
+      main {
+        padding-top: 35px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">FlyRank ML Capstone · Refresh / Content Opportunity Scoring</div>
+
+    <h1>Content Refresh Opportunity Scoring</h1>
+
+    <p>
+      A decision-support approach for prioritizing content pages for human review
+      using observable search-performance and content signals.
+    </p>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#question">Question</a>
+    <a href="#data">Data</a>
+    <a href="#methodology">Methodology</a>
+    <a href="#results">Results</a>
+    <a href="#limitations">Limitations</a>
+    <a href="#recommendations">Recommendations</a>
+    <a href="#reproducibility">Reproducibility</a>
+    <a href="#acknowledgments">Acknowledgments</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- 1. QUESTION -->
+  <section id="question">
+    <div class="section-number">01 · Question</div>
+    <h2>Research Question</h2>
+
+    <p>
+      <strong>
+        Which content pages should be prioritized for human review or potential
+        refresh based on observable search-performance and content signals?
+      </strong>
+    </p>
+
+    <p>
+      The analysis supports the practical decision of which pages a content team
+      should review first. The output is a ranked list of pages with an
+      associated priority score and reason code.
+    </p>
+
+    <div class="callout">
+      <strong>Decision focus:</strong>
+      The goal is decision support, not prediction of Google's ranking algorithm
+      and not proof that refreshing a page will cause ranking improvement.
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <strong>Decision</strong>
+        <span>Which pages should be reviewed first?</span>
+      </div>
+
+      <div class="card">
+        <strong>Output</strong>
+        <span>Ranked pages with priority scores and reason codes.</span>
+      </div>
+
+      <div class="card">
+        <strong>Use</strong>
+        <span>Human review and content-refresh prioritization.</span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- 2. DATA -->
+  <section id="data">
+    <div class="section-number">02 · Data</div>
+    <h2>Data</h2>
+
+    <p>
+      This analysis uses the FlyRank internship warehouse release and focuses on
+      the <strong>Refresh / Content Opportunity Scoring</strong> lane.
+    </p>
+
+    <div class="metric-grid">
+      <div class="metric">
+        <div class="value">133,852</div>
+        <div class="label">Page-level records</div>
+      </div>
+
+      <div class="metric">
+        <div class="value">52</div>
+        <div class="label">Anonymized clients</div>
+      </div>
+
+      <div class="metric">
+        <div class="value">20,593</div>
+        <div class="label">Observed opportunity pages</div>
+      </div>
+
+      <div class="metric">
+        <div class="value">15.38%</div>
+        <div class="label">Opportunity rate</div>
+      </div>
+    </div>
+
+    <p>
+      Two warehouse tables were used:
+    </p>
+
+    <ul>
+      <li>
+        <code>fact_content_query_90d</code> — query-page observations containing
+        impressions, clicks, CTR-related signals, and ranking-position information.
+      </li>
+      <li>
+        <code>dim_content</code> — content records containing content age,
+        update history, content type, search demand, competition, backlinks,
+        and content-size features.
+      </li>
+    </ul>
+
+    <p>
+      Query-level observations were aggregated to the page level using
+      <code>client_hash_id</code> and <code>content_hash_id</code>. The resulting
+      page-level data were joined with content metadata.
+    </p>
+
+    <p>
+      The available search window covered
+      <strong>April 2, 2026 through June 30, 2026</strong>.
+    </p>
+
+    <p>
+      The analysis uses observable page-level signals including impressions,
+      clicks, CTR, average position, visible-query count, content age,
+      days since update, search volume, competition, backlinks, and content size.
+    </p>
+
+    <div class="callout warning">
+      <strong>Public-safe scope:</strong>
+      No client names, domains, URLs, private search queries, credentials,
+      or raw client exports are included in this public analysis.
+    </div>
+
+    <p>
+      Because the released data provide a single fixed observation window,
+      this study does not contain a future-period outcome. The analysis therefore
+      evaluates observed content-opportunity signals rather than measuring whether
+      a later refresh actually improved performance.
+    </p>
+  </section>
+
+
+  <!-- 3. METHODOLOGY -->
+  <section id="methodology">
+    <div class="section-number">03 · Methodology</div>
+    <h2>Methodology</h2>
+
+    <h3>3.1 Research framing</h3>
+
+    <p>
+      The task is framed as a ranking and scoring problem for content-refresh
+      prioritization. The objective is to identify pages that show combinations
+      of observable signals that make them suitable for human review.
+    </p>
+
+    <h3>3.2 Feature engineering</h3>
+
+    <p>
+      Page-level signals were derived from the warehouse data, including:
+    </p>
+
+    <ul>
+      <li>90-day impressions and clicks</li>
+      <li>Last-30-day and previous-30-day impressions and clicks</li>
+      <li>Average ranking position</li>
+      <li>Number of visible queries</li>
+      <li>Rare-query signals</li>
+      <li>Content age and days since update</li>
+      <li>Search volume and competition</li>
+      <li>Backlinks</li>
+      <li>Content length and structure</li>
+    </ul>
+
+    <p>
+      Additional directional signals were calculated from changes between the
+      latest 30-day period and the previous 30-day period.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Signal</th>
+            <th>Definition used</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Stale</td>
+            <td>At least 90 days since the last update</td>
+          </tr>
+          <tr>
+            <td>Meaningful visibility</td>
+            <td>At least 100 impressions in the 90-day period</td>
+          </tr>
+          <tr>
+            <td>Declining</td>
+            <td>At least 20% impression decline</td>
+          </tr>
+          <tr>
+            <td>Ranking deterioration</td>
+            <td>Average position worsened by at least 5 positions</td>
+          </tr>
+          <tr>
+            <td>CTR opportunity</td>
+            <td>Visible page with non-zero clicks and CTR at or below the 25th percentile</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      The observed CTR-opportunity threshold was approximately
+      <strong>0.001263</strong>.
+    </p>
+
+    <h3>3.3 Observed opportunity label</h3>
+
+    <p>
+      The <code>refresh_opportunity</code> label was constructed from combinations
+      of the observable signals. A page was labeled as an opportunity when it
+      satisfied at least one of the following conditions:
+    </p>
+
+    <ol>
+      <li>Stale + meaningful visibility + impression decline</li>
+      <li>Meaningful visibility + impression decline + ranking deterioration</li>
+      <li>Stale + meaningful visibility + low CTR</li>
+    </ol>
+
+    <div class="callout warning">
+      <strong>Important:</strong>
+      This is a defined observed opportunity condition, not a ground-truth measure
+      of whether refreshing a page would succeed.
+    </div>
+
+    <h3>3.4 Transparent baseline</h3>
+
+    <p>
+      A transparent scoring baseline was created as an interpretable reference.
+      The score combines:
+    </p>
+
+    <ul>
+      <li>30% staleness</li>
+      <li>25% visibility</li>
+      <li>20% impression decline</li>
+      <li>15% ranking position</li>
+      <li>10% CTR opportunity</li>
+    </ul>
+
+    <p>
+      Components were normalized or capped to reduce the influence of extreme
+      observations.
+    </p>
+
+    <h3>3.5 Machine-learning model</h3>
+
+    <p>
+      A Random Forest classifier was trained using 20 numeric features.
+      Missing numeric values were median-imputed using statistics fitted only
+      on the training data.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Setting</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Model</td>
+            <td>Random Forest Classifier</td>
+          </tr>
+          <tr>
+            <td>Number of trees</td>
+            <td>300</td>
+          </tr>
+          <tr>
+            <td>Maximum depth</td>
+            <td>10</td>
+          </tr>
+          <tr>
+            <td>Minimum samples per leaf</td>
+            <td>20</td>
+          </tr>
+          <tr>
+            <td>Class weighting</td>
+            <td>Balanced</td>
+          </tr>
+          <tr>
+            <td>Random state</td>
+            <td>42</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>3.6 Evaluation design</h3>
+
+    <p>
+      A client-grouped 80/20 split was used so that pages from the same client
+      would not appear in both training and test data.
+    </p>
+
+    <div class="metric-grid">
+      <div class="metric">
+        <div class="value">117,944</div>
+        <div class="label">Training pages</div>
+      </div>
+
+      <div class="metric">
+        <div class="value">15,908</div>
+        <div class="label">Test pages</div>
+      </div>
+
+      <div class="metric">
+        <div class="value">41</div>
+        <div class="label">Training clients</div>
+      </div>
+
+      <div class="metric">
+        <div class="value">11</div>
+        <div class="label">Held-out clients</div>
+      </div>
+    </div>
+
+    <p>
+      Client overlap between the training and test groups was zero.
+    </p>
+
+    <p>
+      The primary evaluation metric was <strong>Precision@K</strong>, measuring
+      the proportion of observed opportunity pages among the top K pages ranked
+      by each method. Precision was evaluated at K = 25, 50, 100, 200, and 500.
+    </p>
+  </section>
+
+
+  <!-- 4. RESULTS -->
+  <section id="results">
+    <div class="section-number">04 · Results</div>
+    <h2>Results</h2>
+
+    <p>
+      The held-out test set had an observed opportunity rate of approximately
+      <strong>13.0%</strong>, which provides the random-ranking reference.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Top-K</th>
+            <th>Random Reference</th>
+            <th>Transparent Baseline</th>
+            <th>Random Forest</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>25</td>
+            <td>0.130</td>
+            <td>0.880</td>
+            <td class="highlight">1.000</td>
+          </tr>
+          <tr>
+            <td>50</td>
+            <td>0.130</td>
+            <td>0.700</td>
+            <td class="highlight">1.000</td>
+          </tr>
+          <tr>
+            <td>100</td>
+            <td>0.130</td>
+            <td>0.510</td>
+            <td class="highlight">1.000</td>
+          </tr>
+          <tr>
+            <td>200</td>
+            <td>0.130</td>
+            <td>0.465</td>
+            <td class="highlight">1.000</td>
+          </tr>
+          <tr>
+            <td>500</td>
+            <td>0.130</td>
+            <td>0.394</td>
+            <td class="highlight">0.986</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout success">
+      <strong>Top-50 result:</strong>
+      The Random Forest identified 50 of 50 pages matching the defined observed
+      opportunity condition, compared with 35 of 50 for the transparent baseline.
+    </div>
+
+    <h3>Precision@K comparison</h3>
+
+    <div class="bar-chart">
+
+      <div class="bar-row">
+        <div class="bar-label">
+          <span>Random Forest @25</span>
+          <strong>1.000</strong>
+        </div>
+        <div class="bar-bg">
+          <div class="bar" style="width:100%"></div>
+        </div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-label">
+          <span>Baseline @25</span>
+          <strong>0.880</strong>
+        </div>
+        <div class="bar-bg">
+          <div class="bar" style="width:88%"></div>
+        </div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-label">
+          <span>Random Forest @50</span>
+          <strong>1.000</strong>
+        </div>
+        <div class="bar-bg">
+          <div class="bar" style="width:100%"></div>
+        </div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-label">
+          <span>Baseline @50</span>
+          <strong>0.700</strong>
+        </div>
+        <div class="bar-bg">
+          <div class="bar" style="width:70%"></div>
+        </div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-label">
+          <span>Random Forest @500</span>
+          <strong>0.986</strong>
+        </div>
+        <div class="bar-bg">
+          <div class="bar" style="width:98.6%"></div>
+        </div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-label">
+          <span>Baseline @500</span>
+          <strong>0.394</strong>
+        </div>
+        <div class="bar-bg">
+          <div class="bar" style="width:39.4%"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <p>
+      On the held-out client set, the model produced substantially stronger
+      concentration of the defined opportunity label near the top of the ranking
+      than both the random reference and the transparent baseline.
+    </p>
+
+    <div class="callout warning">
+      <strong>Interpretation:</strong>
+      These results should not be interpreted as 100% prediction accuracy or
+      evidence that refreshing these pages will improve rankings. The target
+      itself was constructed from observable performance and content signals that
+      were also available to the model. The results therefore show that the model
+      effectively recovers and prioritizes the defined opportunity pattern.
+    </div>
+
+    <h3>4.1 Feature importance</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Feature</th>
+            <th>Importance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><code>impressions_90d</code></td>
+            <td>0.237</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><code>avg_position_last30</code></td>
+            <td>0.170</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><code>impressions_prev30</code></td>
+            <td>0.165</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><code>visible_query_count</code></td>
+            <td>0.088</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><code>impressions_last30</code></td>
+            <td>0.086</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td><code>days_since_update</code></td>
+            <td>0.081</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      Visibility, recent ranking position, historical visibility, and content
+      update recency were the strongest contributors to the model's observed
+      opportunity classification.
+    </p>
+  </section>
+
+
+  <!-- 5. LIMITATIONS -->
+  <section id="limitations">
+    <div class="section-number">05 · Limitations</div>
+    <h2>Limitations and Honest Framing</h2>
+
+    <ol>
+      <li>
+        The available warehouse data contain one fixed observation window rather
+        than a before-and-after refresh experiment. The analysis cannot determine
+        whether a future content refresh would improve impressions, clicks, CTR,
+        or ranking position.
+      </li>
+
+      <li>
+        The opportunity label is constructed from observable rules. Because several
+        of the same signals used to construct the label are also used as model
+        features, the high Precision@K partly reflects the model's ability to
+        recover the predefined opportunity pattern.
+      </li>
+
+      <li>
+        The client-grouped split prevents pages from the same client appearing in
+        both training and testing. However, only 11 clients were held out, so
+        performance may differ on a larger or different client population.
+      </li>
+
+      <li>
+        Search-performance signals alone do not capture editorial quality,
+        business priorities, conversion value, brand considerations, topical
+        authority, or human judgment.
+      </li>
+
+      <li>
+        The ranking should be treated as a decision-support system for
+        prioritizing human review, not as an automated instruction that every
+        high-scoring page should be refreshed.
+      </li>
+    </ol>
+
+    <div class="callout warning">
+      <strong>Scope of claims:</strong>
+      No causal claims are made about Google's ranking system or about the effect
+      of content refreshes.
+    </div>
+  </section>
+
+
+  <!-- 6. RECOMMENDATIONS -->
+  <section id="recommendations">
+    <div class="section-number">06 · Recommendations</div>
+    <h2>Ranked Recommendations</h2>
+
+    <p>
+      The final system produces a ranked list of anonymized content pages using
+      the Random Forest opportunity score. The ranking is intended to help a
+      content team decide which pages deserve human review first.
+    </p>
+
+    <ol class="rank-list">
+      <li>
+        <strong>Refresh / review</strong><br>
+        Prioritize pages showing strong combinations of decline, staleness,
+        ranking deterioration, and meaningful visibility.
+      </li>
+
+      <li>
+        <strong>Review CTR opportunity</strong><br>
+        Examine pages with meaningful visibility but relatively weak observed CTR.
+      </li>
+
+      <li>
+        <strong>Review for refresh</strong><br>
+        Consider stale pages with additional weaker performance signals.
+      </li>
+
+      <li>
+        <strong>Monitor</strong><br>
+        Keep pages with limited evidence of an immediate opportunity under
+        observation rather than automatically changing them.
+      </li>
+    </ol>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Priority</th>
+            <th>Recommended action</th>
+            <th>Typical supporting signals</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>High</strong></td>
+            <td>Refresh / review</td>
+            <td>Decline, stale content, worsening position, meaningful visibility</td>
+          </tr>
+          <tr>
+            <td><strong>Medium</strong></td>
+            <td>Review CTR opportunity</td>
+            <td>Meaningful visibility with relatively weak CTR</td>
+          </tr>
+          <tr>
+            <td><strong>Medium</strong></td>
+            <td>Review for refresh</td>
+            <td>Staleness combined with weaker performance signals</td>
+          </tr>
+          <tr>
+            <td><strong>Low</strong></td>
+            <td>Monitor</td>
+            <td>Limited evidence of an immediate opportunity</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      The ranked output should be treated as a review queue. Human review remains
+      necessary before taking action because the model does not observe all
+      editorial or business context.
+    </p>
+  </section>
+
+
+  <!-- 7. REPRODUCIBILITY -->
+  <section id="reproducibility">
+    <div class="section-number">07 · Reproducibility</div>
+    <h2>Reproducibility</h2>
+
+    <p>
+      The analysis can be reproduced using the FlyRank internship warehouse
+      release and the notebook workflow included with this submission.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Setting</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Page-level aggregation</td>
+            <td><code>client_hash_id</code> + <code>content_hash_id</code></td>
+          </tr>
+          <tr>
+            <td>Observation window</td>
+            <td>April 2, 2026 – June 30, 2026</td>
+          </tr>
+          <tr>
+            <td>Train/test split</td>
+            <td>Client-grouped 80/20</td>
+          </tr>
+          <tr>
+            <td>Random state</td>
+            <td>42</td>
+          </tr>
+          <tr>
+            <td>Imputation</td>
+            <td>Median, fitted on training data</td>
+          </tr>
+          <tr>
+            <td>Model</td>
+            <td>Random Forest, 300 trees, max depth 10, minimum leaf size 20</td>
+          </tr>
+          <tr>
+            <td>Evaluation</td>
+            <td>Precision@25, @50, @100, @200, @500</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      No client names, URLs, private queries, credentials, or raw client exports
+      are included in the public analysis.
+    </p>
+
+    <p>
+      The warehouse access token is used only for authenticated dataset access
+      during analysis and is not included in the public submission.
+    </p>
+  </section>
+
+
+  <!-- 8. ACKNOWLEDGMENTS -->
+  <section id="acknowledgments">
+    <div class="section-number">08 · Acknowledgments</div>
+    <h2>Acknowledgments and Data Credit</h2>
+
+    <p>
+      This analysis was completed using the FlyRank internship warehouse release
+      provided for the ML Capstone.
+    </p>
+
+    <p>
+      The analysis uses anonymized warehouse data for research and educational
+      purposes. No client-identifying information or private search data are
+      disclosed in the public submission.
+    </p>
+
+    <div class="callout success">
+      <strong>Final takeaway:</strong>
+      The resulting system provides a transparent way to prioritize content
+      pages for human review using observable search and content signals, while
+      keeping the interpretation limited to measured decision-support results.
+    </div>
+  </section>
+
+</main>
+
+
+<footer class="footer">
+  <div class="footer-inner">
+    <p>
+      <strong>FlyRank ML Capstone</strong><br>
+      Refresh / Content Opportunity Scoring
+    </p>
+
+    <p>
+      This public page contains anonymized, decision-support analysis and does
+      not make causal claims about search-engine ranking behavior.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
+```
 
